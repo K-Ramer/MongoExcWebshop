@@ -22,38 +22,46 @@ internal class MongoDAO : IDAO
         this.collection = this.database.GetCollection<Yarn>(collection);
     }
 
-    public void CreateProduct(Yarn yarn)
+    public bool CreateProduct(Yarn yarn)
     {
-        collection.InsertOne(yarn);
+        try { collection.InsertOne(yarn); return true; }
+        catch(Exception) { return false; }
     }
 
-    public void DeleteProduct(int articleNr)
+    public bool DeleteProduct(int articleNr)
     {
         var deleteFilter = Builders<Yarn>.Filter.Eq("ArticleNr", articleNr);
 
-        collection.DeleteOne(deleteFilter);
+        try { collection.DeleteOne(deleteFilter); return true; }
+        catch(Exception) { return false; }
     }
 
     public List<Yarn> GetAllProducts()
     {
-        return collection.Find(y => true).ToList();
+        try { return collection.Find(y => true).ToList(); }
+        catch(Exception) { return null; }
     }
 
     public Yarn GetOne(int articleNr)
     {
-        return collection.Find(y => y.ArticleNr == articleNr).SingleOrDefault();
+        try { return collection.Find(y => y.ArticleNr == articleNr).SingleOrDefault(); }
+        catch(Exception) { return null; }
     }
 
-    public void UpdateProduct(int articleNr, string field, string value)
+    public bool UpdateProduct(int articleNr, string field, string value)
     {
         var updateFilter = Builders<Yarn>.Filter.Eq("ArticleNr", articleNr);
         var update = Builders<Yarn>.Update.Set(field, value);
-        collection.UpdateOne(updateFilter, update);
+
+        try { collection.UpdateOne(updateFilter, update); return true; }
+        catch(Exception) { return false; }
     }
-    public void UpdateProductInt(int articleNr, string field, int intValue)
+    public bool UpdateProductInt(int articleNr, string field, int intValue)
     {
         var updateFilter = Builders<Yarn>.Filter.Eq("ArticleNr", articleNr);
         var update = Builders<Yarn>.Update.Set(field, intValue);
-        collection.UpdateOne(updateFilter, update);
+        
+        try { collection.UpdateOne(updateFilter, update); return true; }
+        catch (Exception) { return false; }
     }
 }

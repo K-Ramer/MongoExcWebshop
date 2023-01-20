@@ -8,10 +8,10 @@ namespace MongoExcWebshop;
 
 internal interface IDAO
 {
-    public void CreateProduct(Yarn yarn);
-    public void DeleteProduct(int articleNr);
+    public bool CreateProduct(Yarn yarn);
+    public bool DeleteProduct(int articleNr);
     public List<Yarn> GetAllProducts();
     public Yarn GetOne(int articleNr);
-    public void UpdateProduct(int articleNr, string field, string value);
-    public void UpdateProductInt(int articleNr, string field, int intValue);
+    public bool UpdateProduct(int articleNr, string field, string value);
+    public bool UpdateProductInt(int articleNr, string field, int intValue);
 }

@@ -4,6 +4,7 @@ using MongoDB.Driver;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -34,65 +35,74 @@ internal class Controller
                 case 1:
                     io.Clear();
                     List<Yarn> yarns = dAO.GetAllProducts();
-                    io.PrintStringList(yarns);
+                    if (yarns is not null) io.PrintStringList(yarns);
+                    else io.PrintString("Listan är tom eller så uppstod ett oväntat fel.");
                     break;
                 
                 case 2:
                     io.Clear();
                     var newYarn = io.GetNewYarn();
-                    dAO.CreateProduct(newYarn);
                     io.Clear();
-                    io.PrintString("Nytt garn tillagt!\n\n");
+                    if (dAO.CreateProduct(newYarn)) io.PrintString("Nytt garn tillagt!\n\n");
+                    else io.PrintString("Ett oväntat fel uppstod.");
                     break;
                 
                 case 3:
                     io.Clear();
                     List<Yarn> yarnUpdate = dAO.GetAllProducts();
-                    io.PrintStringList(yarnUpdate);
+                    if (yarnUpdate is not null) io.PrintStringList(yarnUpdate);
+                    else io.PrintString("Ett oväntat fel uppstod.");
                     io.PrintString("Ange vilket artikelnummer du vill uppdatera:");
                     int articleNr = io.GetInt();
                     io.Clear();
                     while (dAO.GetOne(articleNr) == null)
                     {
                         io.PrintStringList(yarnUpdate);
-                        io.PrintString("Felaktigt artikelnummer. Försök igen:");
+                        io.PrintString("Felaktigt artikelnummer eller oväntat fel. Försök igen:");
                         articleNr = io.GetInt();
                     }
                     io.Clear();
-                    io.PrintOne(dAO.GetOne(articleNr));
+                    if (dAO.GetOne(articleNr) != null) io.PrintOne(dAO.GetOne(articleNr));
+                    else io.PrintString("Ett oväntat fel uppstod.");
                     io.PrintString("Ange vilket fält du vill uppdatera. En siffra mellan 1 och 5:");
                     var field = io.GetField();
                     io.PrintString("Ange värde:");
                     var value = io.GetString();
                     int intValue;
+                    io.Clear();
                     if (field.Equals("Price") || field.Equals("Qty"))
                     {
                         int.TryParse(value, out intValue);
-                        dAO.UpdateProductInt(articleNr, field, intValue);
+                        if (dAO.UpdateProductInt(articleNr, field, intValue)) { io.PrintString($"Produkt med artikelnummer {articleNr} uppdaterad!\n\n"); }
+                        else { io.PrintString("Ett oväntat fel uppstod."); }
+                        
                     }
                     else
                     {
-                    dAO.UpdateProduct(articleNr, field, value);
+                    if (dAO.UpdateProduct(articleNr, field, value)) { io.PrintString($"Produkt med artikelnummer {articleNr} uppdaterad!\n\n"); }
+                    else io.PrintString("Ett oväntat fel uppstod.");
                     }
-                    io.Clear();
-                    io.PrintString($"Produkt med artikelnummer {articleNr} uppdaterad!\n\n");
                     break;
                 
                 case 4:
                     io.Clear();
                     List<Yarn> yarnDelete = dAO.GetAllProducts();
-                    io.PrintStringList(yarnDelete);
-                    io.PrintString("Ange vilket artikelnummer du vill ta bort:");
-                    int articleNrDelete = io.GetInt();
-                    io.Clear();
-                    while (dAO.GetOne(articleNrDelete) == null)
+                    if (yarnDelete is not null)
                     {
                         io.PrintStringList(yarnDelete);
-                        io.PrintString("Felaktigt artikelnummer. Försök igen:");
-                        articleNrDelete = io.GetInt();
+                        io.PrintString("Ange vilket artikelnummer du vill ta bort:");
+                        int articleNrDelete = io.GetInt();
+                        io.Clear();
+                        while (dAO.GetOne(articleNrDelete) == null)
+                        {
+                            io.PrintStringList(yarnDelete);
+                            io.PrintString("Felaktigt artikelnummer. Försök igen:");
+                            articleNrDelete = io.GetInt();
+                        }
+                        if (dAO.DeleteProduct(articleNrDelete)) { io.PrintString("Produkt borttagen.\n\n"); }
+                        else io.PrintString("Ett oväntat fel uppstod.");
                     }
-                    dAO.DeleteProduct(articleNrDelete);
-                    io.PrintString("Produkt borttagen.\n\n");
+                    else io.PrintString("Det finns inga produkter att ta bort eller så uppstod ett oväntat fel.");
                     break;
                 
                 case 5:
@@ -104,5 +114,6 @@ internal class Controller
                     break;
             }
         }
+       
     }
 }

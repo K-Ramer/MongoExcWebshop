@@ -31,11 +31,11 @@ internal class StringIO : IUI
         PrintString("Skriv in produktnamn:");
         string name = GetString();
         while (string.IsNullOrWhiteSpace(name))
-            PrintString("Skriv in produktnamn:");
+            { PrintString("Skriv in produktnamn:"); name = GetString(); }
         PrintString("Skriv in material:");
         string material = GetString();
         while (string.IsNullOrWhiteSpace(material))
-            PrintString("Skriv in material:");
+            { PrintString("Skriv in material:"); material = GetString(); }
         PrintString("Skriv in pris:");
         int price;
         while (!int.TryParse(GetString(), out price))
